@@ -18,75 +18,69 @@ const authQuestion = () => {
 const newUeser = () => {
   return new Promise((resolve, reject) => {
     rl.question("van e uj diak? ", async (answer) => {
-      const response = await axios.get(`http://localhost:3000/`);
       if (answer === "igen") {
-        console.log(adatbazis);
+        resolve(true);
       } else {
-        changeUeser();
+        resolve(false);
       }
-
-      resolve(true);
     });
   });
 };
-const addnewUeser = () => {
+const addnewUser = () => {
   return new Promise((resolve, reject) => {
     rl.question("adja hozza az uj diakot ", async (answer) => {
-      const response = await axios.post(`http://localhost:3000/`, {
-        oldname: changeUeser,
-        newname: answer,
+      await axios.post(`http://localhost:3000/`, {
+        oldname: changeUser,
+        Name: answer,
       });
 
-      resolve(answer);
+      resolve();
     });
   });
 };
-const changeUeser = () => {
+const changeUser = () => {
   return new Promise((resolve, reject) => {
-    rl.question("kit szeretne megvaltoztatni? ", async (answer) => {
-      const response = await axios.get(`http://localhost:3000/`, {
-        name: answer,
-      });
-
-      resolve(answer);
-    });
+    rl.question(
+      "kit szeretne megvaltoztatni? Irja be az ID-jet. ",
+      async (answer) => {
+        const response = await axios.get(`http://localhost:3000/${answer}`);
+        const userNametoChange = response.data.name;
+        rl.question("Mire szeretne megvalltoztatni? ", async (answer) => {
+          const response = await axios.put(`http://localhost:3000/`, {
+            oldName: userNametoChange,
+            name: answer,
+          });
+          resolve();
+        });
+      }
+    );
   });
 };
-const changedUeser = (changeUeser) => {
-  return new Promise((resolve, reject) => {
-    rl.question("Valtoztaott nev ? ", async (answer) => {
-      const response = await axios.get(`http://localhost:3000/`, {
-        oldname: changeUeser,
-        newname: answwer,
-      });
 
-      resolve(answer);
-    });
+const deleteUser = () => {
+  return new Promise((resolve, reject) => {
+    rl.question(
+      "kit szeretne kitorolni? Irja be az ID-jet. ",
+      async (answer) => {
+        const response = await axios.delete(`http://localhost:3000/${answer}`);
+        resolve();
+      }
+    );
   });
 };
 
 async function main() {
   const tanar = await authQuestion();
-  console.log(tanar);
+
   if (tanar) {
-    const ujdiak = await newUeser();
-    console.log(ujdiak);
+    /* const ujdiak = await newUeser();
+
     if (ujdiak) {
-      const student = await addnewUeser();
-      console.log(student);
-      console.log("hii", student);
-      if (student) {
-        const change = await changeUeser();
-        console.log("hello", change);
-        if (change) {
-          const changed = await changedUeser;
-          if (changed) {
-            const changedname = await changedUeser(change);
-            console.log("Ujnev:", changedname);
-          }
-        }
-      }
+      await addnewUser();
     }
+
+    await changeUser();*/
+    await deleteUser();
   }
 
   rl.close();
